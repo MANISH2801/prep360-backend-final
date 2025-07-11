@@ -8,9 +8,11 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 const { authenticate, authorize } = require('../middleware/auth');
+const { deviceLock } = require('../middleware/deviceLock');
+
 
 // create chapter
-router.post('/:courseId/chapters', authenticate, authorize('admin'), async (req, res, next) => {
+router.post('/:courseId/chapters', authenticate, authorize('admin'),  deviceLock, async (req, res, next) => {
   try {
     const { courseId } = req.params;
     const { title, order } = req.body;
@@ -23,7 +25,7 @@ router.post('/:courseId/chapters', authenticate, authorize('admin'), async (req,
 });
 
 // update chapter
-router.put('/chapters/:id', authenticate, authorize('admin'), async (req, res, next) => {
+router.put('/chapters/:id', authenticate, authorize('admin'), deviceLock, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { title, order } = req.body;
@@ -36,7 +38,7 @@ router.put('/chapters/:id', authenticate, authorize('admin'), async (req, res, n
 });
 
 // delete chapter
-router.delete('/chapters/:id', authenticate, authorize('admin'), async (req, res, next) => {
+router.delete('/chapters/:id', authenticate, authorize('admin'), deviceLock, async (req, res, next) => {
   try {
     const { id } = req.params;
     await pool.query('DELETE FROM chapters WHERE id=$1', [id]);
