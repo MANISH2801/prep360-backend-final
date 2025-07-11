@@ -5,7 +5,7 @@
  *   description: Payment and order handling
  */
 const express = require('express');
-const { authenticate, authorize } = require('middleware/auth');
+const { authenticate, authorize } = require('../middleware/deviceLock');
 const router = express.Router();
 const pool = require('../db');
 const crypto = require('crypto');
