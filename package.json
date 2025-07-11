@@ -18,7 +18,6 @@
   "express": "^4.19.2",
   "express-rate-limit": "^6.7.0",
   "helmet": "^7.0.0",
-  "joi": "^17.9.2",
   "jsonwebtoken": "^9.0.0",
   "knex": "^3.1.0",
   "multer": "1.4.4-lts.1",
@@ -27,7 +26,9 @@
   "stripe": "^16.0.0",
   "swagger-jsdoc": "^6.2.8",
   "swagger-ui-express": "^4.6.3",
+  "qrcode": "^1.5.3",
   "speakeasy": "^2.0.0",
+  "joi": "^17.9.2",
   "uuid": "^9.0.0"
 }
 }
