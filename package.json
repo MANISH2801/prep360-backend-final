@@ -1,7 +1,9 @@
 {
   "name": "prep360-backend",
   "version": "1.0.0",
-  "description": "Backend for Prep360 with TOTP and mock payment",
+  "engines": {
+    "node": "18.x"
+  },
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
