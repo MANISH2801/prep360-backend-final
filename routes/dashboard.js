@@ -7,6 +7,7 @@
  */
 // routes/dashboard.js
 const express = require('express');
+const { authenticate, authorize } = require('middleware/auth');
 const pool = require('../db');
 const router = express.Router();
 

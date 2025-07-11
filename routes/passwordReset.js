@@ -7,6 +7,7 @@
  */
 // routes/passwordReset.js
 const express = require('express');
+const { authenticate, authorize } = require('middleware/auth');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const pool = require('../db');

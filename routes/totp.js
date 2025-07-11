@@ -7,6 +7,7 @@
  */
 // routes/totp.js
 const express = require('express');
+const { authenticate, authorize } = require('middleware/auth');
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
 const pool = require('../db');
