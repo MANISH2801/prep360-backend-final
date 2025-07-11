@@ -6,7 +6,8 @@
   },
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "postinstall": "npm rebuild bcrypt --build-from-source"
   },
   "dependencies": {
   "aws-sdk": "2.1636.0",
