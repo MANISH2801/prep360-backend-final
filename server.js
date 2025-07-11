@@ -12,6 +12,13 @@ const Joi        = require('joi');
 const pool       = require('./db');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
+const totpRoutes      = require('./routes/totp');
+const pwResetRoutes   = require('./routes/passwordReset');
+const enrollmentRoutes= require('./routes/enrollments');
+const videosRoutes    = require('./routes/videos');
+const dashboardRoutes = require('./routes/dashboard');
+const deviceLock      = require('./middleware/deviceLock');
+
 
 const app = express();
 app.use(express.json());
@@ -20,7 +27,26 @@ app.use(express.json());
 /* ✔ Generic JWT guard */
 function auth (req, res, next) {
   const hdr   = req.headers.authorization || '';
-  const token = hdr.replace(/^Bearer\s+/i, '');
+    // Step 4.5: If TOTP is enabled, verify token
+    if (user.totp_enabled) {
+      const totpToken = req.body.totp;
+      if (!totpToken) return res.status(401).json({ error: 'TOTP token required' });
+      const speakeasy = require('speakeasy');
+      const validTOTP = speakeasy.totp.verify({
+        secret: user.totp_secret,
+        encoding: 'base32',
+        token: totpToken
+      });
+      if (!validTOTP) return res.status(401).json({ error: 'Invalid TOTP token' });
+    }
+
+    // Step 5: Create and return JWT + user info
+    const token = jwt.sign(
+      { id: user.id, device_id },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
 
   if (!token) return res.status(401).json({ error: 'No token provided' });
 
@@ -207,7 +233,8 @@ app.post('/login', async (req, res) => {
     );
 
     // Step 5: Create and return JWT + user info
-    const token = jwt.sign(
+    const token = // 🛡️  Attach device ID to payload if provided
+  jwt.sign(
       { id: user.id, device_id },
       JWT_SECRET,
       { expiresIn: '7d' }
@@ -555,9 +582,21 @@ app.delete('/enrollments/:user_id/:course_id',
   res.json({ message: 'Unenrolled ✅' });
 });
 
+
+// ─────────────────── Added feature routes ───────────────────
+app.use('/auth/2fa', auth, totpRoutes);
+app.use('/auth', pwResetRoutes); // includes request-password-reset & reset-password
+app.use('/courses', auth, deviceLock, enrollmentRoutes); // enrollment endpoints
+app.use('/courses', auth, deviceLock, requireAdmin, videosRoutes); // video endpoints (admin)
+app.use('/admin/dashboard', auth, deviceLock, requireAdmin, dashboardRoutes);
+
+
 // ─────────────── Swagger docs served at /docs ───────────────
 // Serve Swagger docs at /api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/payments', require('./routes/payment'));
+app.use('/chapters', require('./routes/chapters'));
+app.use('/lessons', require('./routes/lessons'));
 
 // ─────────────── Start server ───────────────
 const PORT = process.env.PORT || 3000;

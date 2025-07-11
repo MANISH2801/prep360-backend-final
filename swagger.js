@@ -11,7 +11,7 @@ const options = {
     },
     servers: [{ url: 'http://localhost:3000' }],
   },
-  apis: ['./server.js'], // <- Update this if needed
+  apis: ['./server.js', './routes/*.js'], // <- Update this if needed
 };
 
 const swaggerSpec = swaggerJSDoc(options);
